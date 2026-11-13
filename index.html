@@ -1,0 +1,2800 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#342b34">
+<title>A Letter from Doha</title>
+
+<style>
+:root {
+  --site-primary: #5b3b32;
+  --site-secondary: #c89a62;
+  --site-background: #342b34;
+  --site-on-background: #fff3e3;
+  --paper: #f2e7d2;
+  --ink: #34332f;
+  --gold: #a98554;
+  --site-font-body: Georgia, 'Times New Roman', serif;
+  --site-font-heading: 'Palatino Linotype', 'Book Antiqua', Georgia, serif;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  background: var(--site-background);
+  color: var(--site-on-background);
+  font-family: var(--site-font-body);
+}
+
+button { font: inherit; }
+
+button:focus-visible {
+  outline: 2px solid #f2d69e;
+  outline-offset: 5px;
+}
+
+#app {
+  min-height: 100svh;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--site-background);
+}
+
+#app::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background: radial-gradient(ellipse at 50% 38%,#806052 0%,#51404a 43%,#342b34 84%);
+}
+
+#app::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: .8;
+  background-image: radial-gradient(rgba(225,203,163,.17) .7px,transparent .7px);
+  background-size: 24px 24px;
+  mask-image: linear-gradient(to bottom,black,transparent 75%);
+}
+
+.ambient {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.ambient::before,
+.ambient::after {
+  content: '';
+  position: absolute;
+  width: 340px;
+  height: 340px;
+  border: 1px solid rgba(197,166,112,.13);
+  border-radius: 50%;
+}
+
+.ambient::before { top: -210px; right: -130px; }
+
+.ambient::after {
+  bottom: -245px;
+  left: -160px;
+  width: 440px;
+  height: 440px;
+}
+
+.topline {
+  padding: 30px 22px 0;
+  text-align: center;
+  color: #e7c99d;
+  font: 10px/1.5 Arial,sans-serif;
+  letter-spacing: .32em;
+  text-transform: uppercase;
+}
+
+/* SOUND CONTROL */
+
+.sound-toggle {
+  position: fixed;
+  z-index: 100;
+  top: 15px;
+  right: 16px;
+  width: 38px;
+  height: 38px;
+  border: 1px solid rgba(214,173,121,.5);
+  border-radius: 50%;
+  background: rgba(52,43,52,.7);
+  color: #f0dfce;
+  cursor: pointer;
+  font: 16px Arial,sans-serif;
+  display: grid;
+  place-items: center;
+  backdrop-filter: blur(8px);
+  transition: background .25s, transform .25s;
+}
+
+.sound-toggle:hover {
+  background: rgba(120,85,68,.8);
+  transform: translateY(-2px);
+}
+
+.scene {
+  width: min(100%,760px);
+  min-height: calc(100svh - 54px);
+  margin: auto;
+  padding: clamp(26px,6vh,62px) 20px 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.eyebrow {
+  color: #e4bd8b;
+  font: 10px/1.5 Arial,sans-serif;
+  letter-spacing: .28em;
+  text-transform: uppercase;
+  margin-bottom: 15px;
+}
+
+h1 {
+  font-family: var(--site-font-heading);
+  font-weight: 400;
+  font-size: clamp(36px,7vw,58px);
+  line-height: 1.08;
+  margin: 0;
+  letter-spacing: -.025em;
+}
+
+.subtitle {
+  color: #f0dfce;
+  font-size: 15px;
+  line-height: 1.7;
+  max-width: 390px;
+  margin: 16px auto 25px;
+}
+
+/* ENVELOPE */
+
+.envelope-stage {
+  width: min(100%,460px);
+  margin: 10px auto 0;
+  perspective: 1500px;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.envelope-wrap {
+  width: 100%;
+  height: 310px;
+  position: relative;
+  perspective: 1500px;
+  cursor: grab;
+  filter: drop-shadow(0 25px 28px rgba(0,0,0,.3));
+  transition: opacity .7s ease,transform .8s ease;
+}
+
+.envelope-wrap:active { cursor: grabbing; }
+
+.envelope-3d {
+  position: absolute;
+  inset: 30px 0 0;
+  transform-style: preserve-3d;
+  transform: rotateY(0deg);
+  transition: transform 1.05s cubic-bezier(.22,.75,.25,1);
+}
+
+.envelope-wrap.turned .envelope-3d { transform: rotateY(180deg); }
+
+.envelope-face {
+  position: absolute;
+  inset: 0;
+  border-radius: 5px;
+  overflow: hidden;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.envelope-front {
+  background: linear-gradient(145deg,#e9dcc2,#c5ac80);
+  border: 1px solid rgba(255,245,220,.45);
+}
+
+.envelope-front::before,
+.envelope-back-face::before {
+  content: '';
+  position: absolute;
+  inset: 9px;
+  border: 1px solid rgba(130,103,65,.3);
+  pointer-events: none;
+}
+
+.front-address {
+  position: absolute;
+  top: 27px;
+  left: 28px;
+  text-align: left;
+  color: #67523a;
+  font-family: Arial,sans-serif;
+  font-size: 12px;
+  line-height: 1.55;
+  letter-spacing: .035em;
+  font-weight: 500;
+}
+
+.front-address span {
+  display: block;
+  font-size: 9px;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: #967b53;
+  margin-bottom: 5px;
+}
+
+.front-recipient {
+  position: absolute;
+  top: 43%;
+  left: 50%;
+  width: 85%;
+  transform: translate(-50%,-35%);
+  color: #60483b;
+  font: italic clamp(25px,4vw,32px) var(--site-font-heading);
+  text-align: center;
+}
+
+.front-recipient::after {
+  content: '';
+  display: block;
+  width: 55px;
+  height: 1px;
+  background: #b49467;
+  margin: 14px auto 0;
+}
+
+.front-recipient-address {
+  position: absolute;
+  top: 59%;
+  left: 50%;
+  width: 80%;
+  transform: translateX(-50%);
+  color: #725b43;
+  font: 10px/1.55 Arial,sans-serif;
+  letter-spacing: .045em;
+  text-align: center;
+}
+
+.front-bottom {
+  position: absolute;
+  bottom: 22px;
+  left: 0;
+  width: 100%;
+  color: #927957;
+  font: 9px Arial,sans-serif;
+  letter-spacing: .23em;
+  text-transform: uppercase;
+}
+
+/* DOHA POSTMARK */
+
+.postmark {
+  position: absolute;
+  right: 24px;
+  top: 22px;
+  width: 72px;
+  height: 72px;
+  border: 1px solid rgba(113,78,54,.62);
+  border-radius: 50%;
+  color: #806044;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transform: rotate(9deg);
+  opacity: .82;
+  font-family: Arial,sans-serif;
+  text-align: center;
+  background: rgba(244,230,203,.15);
+}
+
+.postmark::before {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border: 1px dashed rgba(113,78,54,.55);
+  border-radius: 50%;
+}
+
+.postmark strong {
+  font-size: 10px;
+  letter-spacing: .12em;
+}
+
+.postmark span {
+  font-size: 7px;
+  letter-spacing: .13em;
+  margin-top: 3px;
+}
+
+.postmark small {
+  font-size: 7px;
+  margin-top: 4px;
+  letter-spacing: .06em;
+}
+
+.envelope-back-face {
+  transform: rotateY(180deg);
+  background: linear-gradient(145deg,#d9c7a6,#b79c72);
+  border: 1px solid rgba(255,245,220,.4);
+}
+
+.back-pocket {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: linear-gradient(145deg,#d7c19b,#b69a6e);
+  clip-path: polygon(0 0,50% 55%,100% 0,100% 100%,0 100%);
+}
+
+.back-flap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 66%;
+  z-index: 4;
+  transform-origin: top;
+  transform: rotateX(0deg);
+  transition: transform .95s cubic-bezier(.2,.75,.25,1);
+  background: linear-gradient(160deg,#eee0c4,#c4aa7d);
+  clip-path: polygon(0 0,100% 0,50% 100%);
+  backface-visibility: hidden;
+}
+
+.back-flap::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(160deg,rgba(255,255,255,.15),transparent);
+}
+
+.envelope-wrap.opened .back-flap {
+  transform: rotateX(180deg);
+  z-index: 1;
+}
+
+.seal-button {
+  position: absolute;
+  z-index: 6;
+  top: 47%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+  width: 57px;
+  height: 57px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(255,245,220,.7);
+  background: radial-gradient(circle at 35% 30%,#dfc38a,#927044 78%);
+  color: #fff0cf;
+  display: grid;
+  place-items: center;
+  font: 22px var(--site-font-heading);
+  box-shadow: 0 4px 12px #715b3d77;
+  cursor: pointer;
+  transition: opacity .4s,transform .4s;
+}
+
+.seal-button:hover { transform: translate(-50%,-50%) scale(1.08); }
+
+.envelope-wrap.opened .seal-button {
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%,-50%) scale(.5);
+}
+
+.back-caption {
+  position: absolute;
+  z-index: 3;
+  bottom: 23px;
+  width: 100%;
+  text-align: center;
+  color: #826a49;
+  font: 9px Arial,sans-serif;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+}
+
+.envelope-wrap.extracted {
+  opacity: .12;
+  transform: translateY(70px) scale(.88);
+  pointer-events: none;
+}
+
+.instruction {
+  color: #c5b49e;
+  font: 11px/1.7 Arial,sans-serif;
+  letter-spacing: .07em;
+  margin-top: 17px;
+  min-height: 20px;
+}
+
+.stage-hint {
+  color: #e4bd8b;
+  font: 9px Arial,sans-serif;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  margin-top: 12px;
+}
+
+/* EXTRACTED LETTER */
+
+.folded-letter-wrap {
+  position: absolute;
+  z-index: 10;
+  width: min(82%,340px);
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%,-35%) scale(.75);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 1s cubic-bezier(.2,.75,.25,1),opacity .8s ease;
+}
+
+.folded-letter-wrap.visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(-50%,-48%) scale(1);
+}
+
+.folded-letter {
+  position: relative;
+  display: block;
+  width: 100%;
+  min-height: 185px;
+  padding: 24px;
+  cursor: grab;
+  border: 1px solid #c9b99c;
+  background:
+    repeating-linear-gradient(0deg,rgba(112,91,62,.035) 0,rgba(112,91,62,.035) 1px,transparent 1px,transparent 4px),
+    linear-gradient(135deg,#fff8e9,#e9dcc4);
+  color: #34332f;
+  box-shadow: 0 20px 40px #0006;
+  text-align: center;
+  transform-style: preserve-3d;
+  transition: box-shadow .4s,transform .6s ease;
+  touch-action: none;
+}
+
+.folded-letter:active { cursor: grabbing; }
+
+.folded-letter::before {
+  content: '';
+  position: absolute;
+  inset: 9px;
+  border: 1px solid rgba(157,128,87,.4);
+  pointer-events: none;
+}
+
+.folded-letter .fold-line {
+  height: 1px;
+  background: rgba(150,122,79,.3);
+  margin: 16px 0;
+}
+
+.fold-title {
+  font: 9px Arial,sans-serif;
+  letter-spacing: .23em;
+  color: #9b8055;
+  text-transform: uppercase;
+}
+
+.fold-name {
+  font: italic 29px var(--site-font-heading);
+  color: #303a3c;
+  margin: 18px 0;
+}
+
+.fold-hint {
+  font: 9px Arial,sans-serif;
+  letter-spacing: .13em;
+  color: #897d6a;
+  text-transform: uppercase;
+}
+
+.fold-address {
+  font: 9px Arial,sans-serif;
+  letter-spacing: .12em;
+  color: #9b8055;
+  margin-top: 17px;
+}
+
+.extraction-hint {
+  color: #e4bd8b;
+  font: 10px/1.6 Arial,sans-serif;
+  letter-spacing: .13em;
+  margin-top: 18px;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+/* LETTER PAPER */
+
+#letterScene { padding-top: 35px; }
+
+.paper-stage {
+  position: relative;
+  width: min(100%,620px);
+  margin: 0 auto;
+  perspective: 1600px;
+}
+
+.paper {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background-color: #eee3cd;
+  background-image:
+    repeating-linear-gradient(0deg,rgba(112,91,62,.035) 0,rgba(112,91,62,.035) 1px,transparent 1px,transparent 4px),
+    repeating-linear-gradient(90deg,rgba(255,255,255,.24) 0,rgba(255,255,255,.24) 1px,transparent 1px,transparent 5px),
+    radial-gradient(ellipse at 18% 12%,#fff9e9 0%,transparent 55%),
+    linear-gradient(135deg,#f4ead6,#e9dcc4);
+  color: var(--ink);
+  text-align: left;
+  padding: clamp(28px,6vw,54px) clamp(25px,7vw,66px);
+  box-shadow: 0 25px 45px #0007,inset 0 0 35px rgba(126,101,65,.12);
+  border: 1px solid #c9b99c;
+  transform-origin: top;
+  animation: paperOpen .9s ease both;
+}
+
+.paper::after {
+  content: '';
+  position: absolute;
+  z-index: -2;
+  inset: 0;
+  opacity: .12;
+  pointer-events: none;
+  background:
+    linear-gradient(to top,rgba(153,120,76,.24),transparent 38%),
+    repeating-linear-gradient(90deg,transparent 0 7%,rgba(151,119,76,.12) 7.1% 7.3%,transparent 7.4% 14%);
+}
+
+.paper .sketch {
+  position: absolute;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  object-fit: cover;
+  border: 0;
+  box-shadow: none;
+  opacity: .19;
+  filter: sepia(.28) saturate(.75) contrast(.9);
+  pointer-events: none;
+}
+
+.paper .sketch-caption {
+  position: relative;
+  z-index: 1;
+}
+
+.paper > :not(.sketch) {
+  position: relative;
+  z-index: 1;
+}
+
+.paper:before {
+  content: '';
+  position: absolute;
+  z-index: 3;
+  inset: 12px;
+  border: 1px solid rgba(157,128,87,.48);
+  box-shadow: inset 0 0 0 4px rgba(255,255,255,.13);
+  pointer-events: none;
+}
+
+.paper .smallcap {
+  color: #9b8055;
+  font: 9px Arial,sans-serif;
+  letter-spacing: .24em;
+  text-transform: uppercase;
+}
+
+/* HANDWRITTEN DATE */
+
+.letter-date {
+  margin: 0 0 23px;
+  color: #8b7558;
+  font: italic 14px/1.5 'Palatino Linotype',Georgia,serif;
+  text-align: right;
+  letter-spacing: .015em;
+}
+
+.paper h2 {
+  font: italic 32px var(--site-font-heading);
+  font-weight: 400;
+  margin: 24px 0 23px;
+  color: #303a3c;
+}
+
+.paper p {
+  font-size: clamp(15px,2.3vw,17px);
+  line-height: 1.9;
+  margin: 0 0 17px;
+}
+
+.signature {
+  margin-top: 25px;
+  font-style: italic;
+  font-size: 18px;
+  color: #816b4b;
+}
+
+.signature-name {
+  display: inline-block;
+  margin-top: 7px;
+  font: italic 25px 'Palatino Linotype',Georgia,serif;
+  color: #6d5942;
+  clip-path: inset(0 100% 0 0);
+  opacity: .3;
+}
+
+.signature.signed .signature-name {
+  animation: signatureReveal 2.2s ease forwards;
+}
+
+@keyframes signatureReveal {
+  0% { clip-path: inset(0 100% 0 0); opacity: .3; }
+  100% { clip-path: inset(0 0 0 0); opacity: 1; }
+}
+
+.sketch {
+  width: 100%;
+  margin: 30px auto 4px;
+  display: block;
+  padding: 12px 10px 7px;
+  background:
+    linear-gradient(145deg,rgba(255,255,255,.38),rgba(197,169,125,.13)),
+    repeating-linear-gradient(0deg,rgba(112,91,62,.035) 0,rgba(112,91,62,.035) 1px,transparent 1px,transparent 4px);
+  border: 1px solid rgba(157,128,87,.34);
+  box-shadow: 0 5px 13px rgba(75,57,35,.12),inset 0 0 18px rgba(126,101,65,.08);
+  opacity: 1;
+  filter: drop-shadow(0 .7px .55px rgba(70,65,58,.22)) contrast(1.08) saturate(.88);
+}
+
+.sketch-caption {
+  text-align: center;
+  color: #897d6a;
+  font: 9px Arial,sans-serif;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  margin-top: 5px;
+}
+
+.page-two {
+  display: none;
+  margin-top: 18px;
+}
+
+.page-two.active {
+  display: block;
+  animation: paperOpen .7s ease both;
+}
+
+.page-one.hidden { display: none; }
+
+.page-two .thankyou {
+  text-align: left;
+  padding: 25px 0 5px;
+}
+
+.thankyou h2 {
+  font-size: clamp(30px,6vw,38px);
+  line-height: 1.2;
+  margin: 20px 0;
+}
+
+.thankyou p {
+  max-width: none;
+  margin: 0 0 17px;
+}
+
+.closing {
+  color: #9b8055;
+  font: 10px Arial,sans-serif;
+  letter-spacing: .24em;
+  text-transform: uppercase;
+  margin-top: 38px;
+}
+
+/* HIDDEN P.S. NOTE */
+
+.ps-area {
+  margin: 30px 0 4px;
+  padding-top: 18px;
+  border-top: 1px dashed rgba(157,128,87,.4);
+  text-align: center;
+}
+
+.ps-reveal {
+  border: 0;
+  background: transparent;
+  color: #927653;
+  cursor: pointer;
+  font: italic 14px Georgia,serif;
+  padding: 8px 12px;
+  transition: color .2s,transform .2s;
+}
+
+.ps-reveal:hover {
+  color: #60483b;
+  transform: translateY(-2px);
+}
+
+.ps-note {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transform: translateY(-5px);
+  transition: max-height .8s ease,opacity .7s ease,transform .7s ease;
+}
+
+.ps-note.visible {
+  max-height: 180px;
+  opacity: 1;
+  transform: translateY(0);
+  padding: 10px 5px 4px;
+}
+
+.ps-note p {
+  color: #75634d;
+  font: italic 15px/1.8 Georgia,serif;
+  margin: 0;
+}
+
+/* PAGE INDICATOR AND TURN PROMPT */
+
+.page-navigation {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 9px;
+  margin: 34px auto 3px;
+  padding-top: 17px;
+  border-top: 1px solid rgba(157,128,87,.28);
+  text-align: center;
+}
+
+.page-count {
+  color: #9b8055;
+  font: 9px Arial,sans-serif;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+}
+
+.turn-page-prompt {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 8px 12px;
+  border: 0;
+  background: transparent;
+  color: #806647;
+  cursor: pointer;
+  font: 11px Arial,sans-serif;
+  letter-spacing: .1em;
+  transition: color .2s,transform .2s;
+}
+
+.turn-page-prompt:hover {
+  color: #a27a4d;
+  transform: translateY(2px);
+}
+
+.turn-page-prompt .arrow {
+  font-size: 16px;
+  transition: transform .2s;
+}
+
+.turn-page-prompt:hover .arrow { transform: translateY(3px); }
+
+.page-end-note {
+  color: #897d6a;
+  font: 10px Arial,sans-serif;
+  letter-spacing: .1em;
+}
+
+/* PAGE CONTROLS */
+
+.page-controls { margin-top: 22px; }
+
+.controls {
+  min-height: 48px;
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.action {
+  border: 1px solid #d6ad79;
+  background: #d6ad79;
+  color: #34231f;
+  border-radius: 3px;
+  padding: 12px 20px;
+  cursor: pointer;
+  font: 10px Arial,sans-serif;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  transition: background .2s,transform .2s;
+}
+
+.action:disabled {
+  opacity: .55;
+  cursor: default;
+  transform: none;
+}
+
+.action:hover {
+  background: #edc99a;
+  transform: translateY(-2px);
+}
+
+.action.secondary {
+  background: transparent;
+  color: #f5e5d2;
+  border-color: #b28d68;
+}
+
+.page-back {
+  background: transparent;
+  color: #f5e5d2;
+  border-color: rgba(214,173,121,.65);
+}
+
+.page-back:hover { background: rgba(214,173,121,.15); }
+
+.page-hint {
+  color: #c5b49e;
+  font: 10px/1.7 Arial,sans-serif;
+  letter-spacing: .08em;
+  text-align: center;
+  margin-top: 13px;
+}
+
+.footer {
+  margin-top: 32px;
+  color: #b9ad99;
+  font: 9px Arial,sans-serif;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+}
+
+.hidden { display: none !important; }
+
+@keyframes paperOpen {
+  from { opacity: 0; transform: rotateX(-15deg) translateY(25px); }
+  to { opacity: 1; transform: rotateX(0) translateY(0); }
+}
+
+/* FINAL CHOICES */
+
+.letter-choices {
+  width: min(100%,620px);
+  margin: 24px auto 0;
+  padding: 22px 18px;
+  border: 1px solid rgba(214,173,121,.48);
+  background: rgba(52,35,31,.22);
+  text-align: center;
+  animation: paperOpen .65s ease both;
+}
+
+.letter-choices .choice-caption {
+  margin: 0 0 16px;
+  color: #e8d3b6;
+  font: 10px/1.7 Arial,sans-serif;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+.letter-choices .controls { gap: 10px; }
+.letter-choices .action { min-width: 150px; }
+
+.action.throw-away {
+  color: #f5e5d2;
+  background: transparent;
+  border-color: rgba(214,173,121,.65);
+}
+
+.action.throw-away:hover { background: rgba(214,173,121,.13); }
+
+/* HAND ANIMATIONS */
+
+.paper-hand {
+  position: absolute;
+  z-index: 20;
+  bottom: -125px;
+  width: 112px;
+  height: 165px;
+  opacity: 0;
+  pointer-events: none;
+  filter: drop-shadow(0 5px 7px rgba(0,0,0,.2));
+}
+
+.left-hand {
+  left: 2%;
+  transform: translate(-50px,100px) rotate(-15deg);
+}
+
+.right-hand {
+  right: 2%;
+  transform: translate(50px,100px) rotate(15deg);
+}
+
+.paper-hand .palm {
+  position: absolute;
+  bottom: 0;
+  left: 18px;
+  width: 76px;
+  height: 100px;
+  border-radius: 38px 38px 25px 25px;
+  background: linear-gradient(110deg,#d6a17d,#efc09c 48%,#c88e6c);
+  border: 1px solid rgba(117,70,48,.15);
+}
+
+.paper-hand .finger {
+  position: absolute;
+  top: 12px;
+  width: 20px;
+  height: 82px;
+  border-radius: 16px;
+  background: linear-gradient(90deg,#c88e6c,#efc09c 55%,#d5a17f);
+  transform-origin: bottom center;
+  border: 1px solid rgba(117,70,48,.12);
+}
+
+.paper-hand .finger-one { left: 20px; height: 75px; }
+.paper-hand .finger-two { left: 40px; height: 88px; }
+.paper-hand .finger-three { left: 60px; height: 83px; }
+.paper-hand .finger-four { left: 79px; height: 68px; }
+
+.paper-hand .thumb {
+  position: absolute;
+  top: 69px;
+  left: 0;
+  width: 29px;
+  height: 65px;
+  border-radius: 20px;
+  background: linear-gradient(90deg,#c88e6c,#efc09c 65%,#d5a17f);
+  transform: rotate(-38deg);
+  transform-origin: top center;
+}
+
+.right-hand .thumb {
+  left: 83px;
+  transform: rotate(38deg);
+}
+
+/* KEEP: NATURAL FOLDING */
+
+.paper-stage.keep-folding .paper {
+  animation: foldPaper 1.85s cubic-bezier(.45,.05,.65,.95) forwards;
+  transform-origin: center center;
+  pointer-events: none;
+}
+
+.paper-stage.keep-folding .paper-hand {
+  animation-duration: 1.85s;
+  animation-timing-function: ease-in-out;
+  animation-fill-mode: forwards;
+}
+
+.paper-stage.keep-folding .left-hand { animation-name: leftHandGather; }
+.paper-stage.keep-folding .right-hand { animation-name: rightHandGather; }
+
+@keyframes foldPaper {
+  0% {
+    transform: perspective(1100px) scale(1) rotateX(0);
+    opacity: 1;
+    filter: none;
+    clip-path: inset(0 0 0 0);
+  }
+
+  25% {
+    transform: perspective(1100px) translateY(-5px) scale(.98,.94) rotateX(5deg);
+    opacity: 1;
+  }
+
+  48% {
+    transform: perspective(1100px) scale(.94,.72) rotateX(12deg);
+    filter: brightness(.98);
+    clip-path: inset(0 0 12% 0);
+  }
+
+  68% {
+    transform: perspective(1100px) translateY(-12px) scale(.84,.48) rotateX(18deg);
+    filter: brightness(.96);
+    clip-path: inset(0 0 25% 0);
+  }
+
+  86% {
+    transform: perspective(1100px) translateY(-28px) scale(.72,.32) rotateX(22deg);
+    opacity: .9;
+    clip-path: inset(0 0 38% 0);
+  }
+
+  100% {
+    transform: perspective(1100px) translateY(-38px) scale(.66,.27) rotateX(25deg);
+    opacity: 0;
+    clip-path: inset(0 0 42% 0);
+  }
+}
+
+@keyframes leftHandGather {
+  0% { opacity: 0; transform: translate(-50px,100px) rotate(-15deg); }
+  22% { opacity: 1; transform: translate(5px,-15px) rotate(5deg); }
+  48% { opacity: 1; transform: translate(25px,-35px) rotate(15deg); }
+  75% { opacity: 1; transform: translate(30px,-125px) rotate(5deg) scale(.8); }
+  100% { opacity: 0; transform: translate(30px,-260px) rotate(0) scale(.4); }
+}
+
+@keyframes rightHandGather {
+  0% { opacity: 0; transform: translate(50px,100px) rotate(15deg); }
+  22% { opacity: 1; transform: translate(-5px,-15px) rotate(-5deg); }
+  48% { opacity: 1; transform: translate(-25px,-35px) rotate(-15deg); }
+  75% { opacity: 1; transform: translate(-30px,-125px) rotate(-5deg) scale(.8); }
+  100% { opacity: 0; transform: translate(-30px,-260px) rotate(0) scale(.4); }
+}
+
+/* THROW IT AWAY */
+
+.paper-stage.throwing .paper {
+  animation: crumpleAndThrow 1.8s cubic-bezier(.45,.02,.8,.3) forwards;
+  transform-origin: center center;
+  pointer-events: none;
+}
+
+.paper-stage.throwing .paper-hand {
+  animation-duration: 1.8s;
+  animation-fill-mode: forwards;
+  animation-timing-function: ease-in-out;
+}
+
+.paper-stage.throwing .left-hand { animation-name: leftHandCrumple; }
+.paper-stage.throwing .right-hand { animation-name: rightHandCrumple; }
+
+@keyframes leftHandCrumple {
+  0% { opacity: 0; transform: translate(-50px,100px) rotate(-15deg); }
+  18% { opacity: 1; transform: translate(5px,-10px) rotate(5deg); }
+  43% { opacity: 1; transform: translate(25px,-35px) rotate(22deg) scale(.9); }
+  68% { opacity: 1; transform: translate(45px,-45px) rotate(30deg) scale(.7); }
+  83% { opacity: .8; transform: translate(90px,-100px) rotate(55deg) scale(.45); }
+  100% { opacity: 0; transform: translate(190px,-220px) rotate(100deg) scale(.2); }
+}
+
+@keyframes rightHandCrumple {
+  0% { opacity: 0; transform: translate(50px,100px) rotate(15deg); }
+  18% { opacity: 1; transform: translate(-5px,-10px) rotate(-5deg); }
+  43% { opacity: 1; transform: translate(-25px,-35px) rotate(-22deg) scale(.9); }
+  68% { opacity: 1; transform: translate(-45px,-45px) rotate(-30deg) scale(.7); }
+  83% { opacity: .8; transform: translate(-90px,-100px) rotate(-55deg) scale(.45); }
+  100% { opacity: 0; transform: translate(-190px,-220px) rotate(-100deg) scale(.2); }
+}
+
+@keyframes crumpleAndThrow {
+  0% {
+    transform: scale(1) rotate(0);
+    border-radius: 0;
+    clip-path: polygon(0 0,100% 0,100% 100%,0 100%);
+    opacity: 1;
+    filter: none;
+  }
+  18% {
+    transform: scale(.94,.88) rotate(-3deg);
+    border-radius: 5px;
+    filter: contrast(1.1);
+  }
+  35% {
+    transform: scale(.75,.7) rotate(7deg);
+    border-radius: 15% 25% 18% 30%;
+    clip-path: polygon(8% 0,90% 5%,100% 85%,85% 100%,5% 90%,0 18%);
+    filter: contrast(1.2);
+  }
+  52% {
+    transform: scale(.48,.48) rotate(-18deg);
+    border-radius: 35% 48% 30% 55%;
+    clip-path: polygon(20% 0,75% 8%,100% 35%,88% 80%,55% 100%,10% 85%,0 35%);
+    filter: contrast(1.35) brightness(.94);
+  }
+  70% {
+    transform: scale(.23,.24) rotate(35deg);
+    border-radius: 45% 55% 40% 55%;
+    clip-path: polygon(35% 0,80% 15%,100% 55%,70% 100%,15% 85%,0 30%);
+    filter: contrast(1.5) brightness(.88);
+  }
+  82% {
+    transform: translate(15px,-35px) scale(.17) rotate(250deg);
+    border-radius: 50%;
+    clip-path: polygon(50% 0,90% 25%,100% 65%,65% 100%,20% 90%,0 45%);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(210px,260px) scale(.035) rotate(850deg);
+    border-radius: 50%;
+    opacity: 0;
+    filter: blur(2px);
+  }
+}
+
+/* RETURN TO THE ORIGINAL ENVELOPE */
+
+.return-scene {
+  width: min(100%,760px);
+  min-height: calc(100svh - 54px);
+  margin: auto;
+  padding: 45px 20px 55px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  animation: paperOpen .8s ease both;
+}
+
+.return-caption {
+  color: #e4bd8b;
+  font: 10px/1.6 Arial,sans-serif;
+  letter-spacing: .23em;
+  text-transform: uppercase;
+  margin-bottom: 38px;
+}
+
+.return-envelope-area {
+  width: min(100%,410px);
+  height: 310px;
+  margin: auto;
+  perspective: 1100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.return-envelope {
+  width: 100%;
+  height: 225px;
+  position: relative;
+  background: linear-gradient(145deg,#d9c7a6,#b79c72);
+  border: 1px solid rgba(255,245,220,.5);
+  border-radius: 4px;
+  box-shadow: 0 20px 35px #0005;
+  overflow: visible;
+  transition: transform .35s ease;
+}
+
+.return-envelope.closed { cursor: pointer; }
+
+.return-envelope.closed:hover { transform: translateY(-3px); }
+
+.return-envelope::before {
+  content: '';
+  position: absolute;
+  inset: 9px;
+  border: 1px solid rgba(130,103,65,.3);
+  pointer-events: none;
+  z-index: 7;
+}
+
+.return-pocket {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  background: linear-gradient(145deg,#d7c19b,#b69a6e);
+  clip-path: polygon(0 0,50% 58%,100% 0,100% 100%,0 100%);
+}
+
+.return-letter-slot {
+  position: absolute;
+  z-index: 2;
+  width: 76%;
+  height: 190px;
+  left: 12%;
+  top: -105px;
+  transition: top 1.15s cubic-bezier(.22,.65,.3,1);
+  cursor: default;
+}
+
+.return-letter {
+  width: 100%;
+  height: 100%;
+  background:
+    repeating-linear-gradient(0deg,rgba(112,91,62,.035) 0,rgba(112,91,62,.035) 1px,transparent 1px,transparent 4px),
+    linear-gradient(135deg,#fff8e9,#e9dcc4);
+  border: 1px solid #c9b99c;
+  box-shadow: 0 10px 22px #0004;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  transform: rotate(-1deg);
+  transition: transform .7s ease,box-shadow .7s ease;
+}
+
+.return-letter::before {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  border: 1px solid rgba(157,128,87,.4);
+  pointer-events: none;
+}
+
+.return-letter-top {
+  font: 8px Arial,sans-serif;
+  letter-spacing: .2em;
+  color: #9b8055;
+}
+
+.return-letter-name {
+  margin: 15px 0;
+  font: italic 27px var(--site-font-heading);
+  color: #303a3c;
+}
+
+.return-letter-line {
+  width: 45px;
+  height: 1px;
+  background: #bba47c;
+}
+
+.return-letter-bottom {
+  margin-top: 15px;
+  font: 8px Arial,sans-serif;
+  letter-spacing: .13em;
+  color: #9b8055;
+}
+
+.return-flap {
+  position: absolute;
+  z-index: 4;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 66%;
+  background: linear-gradient(160deg,#eee0c4,#c4aa7d);
+  clip-path: polygon(0 0,100% 0,50% 100%);
+  transform-origin: top;
+  transform: rotateX(180deg);
+  transition: transform 1s cubic-bezier(.2,.7,.25,1);
+  backface-visibility: hidden;
+}
+
+.return-seal {
+  position: absolute;
+  z-index: 6;
+  left: 50%;
+  top: 43%;
+  transform: translate(-50%,-50%) scale(.5);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(circle at 35% 30%,#dfc38a,#927044 78%);
+  color: #fff0cf;
+  border: 1px solid rgba(255,245,220,.7);
+  font: 20px var(--site-font-heading);
+  opacity: 0;
+  transition: opacity .6s ease,transform .6s ease;
+  pointer-events: none;
+}
+
+/* ORIGINAL ENVELOPE ADDRESS ON THE SEALED RETURN */
+
+.return-front-face {
+  position: absolute;
+  z-index: 5;
+  inset: 0;
+  border-radius: 4px;
+  background: linear-gradient(145deg,#e9dcc2,#c5ac80);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .75s ease;
+  color: #67523a;
+  overflow: hidden;
+}
+
+.return-envelope.closed .return-front-face {
+  opacity: 1;
+}
+
+.return-envelope.closed .return-pocket,
+.return-envelope.closed .return-letter-slot,
+.return-envelope.closed .return-flap {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.return-sender {
+  position: absolute;
+  top: 22px;
+  left: 23px;
+  text-align: left;
+  font: 10px/1.5 Arial,sans-serif;
+  letter-spacing: .04em;
+}
+
+.return-sender span {
+  display: block;
+  margin-bottom: 4px;
+  color: #967b53;
+  font-size: 8px;
+  letter-spacing: .2em;
+}
+
+.return-postmark {
+  position: absolute;
+  top: 17px;
+  right: 20px;
+  width: 58px;
+  height: 58px;
+  border: 1px solid rgba(113,78,54,.62);
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  transform: rotate(9deg);
+  color: #806044;
+  font-family: Arial,sans-serif;
+}
+
+.return-postmark strong {
+  font-size: 9px;
+  letter-spacing: .1em;
+}
+
+.return-postmark span,
+.return-postmark small {
+  font-size: 6px;
+  margin-top: 3px;
+  letter-spacing: .1em;
+}
+
+.return-recipient {
+  position: absolute;
+  top: 40%;
+  width: 100%;
+  text-align: center;
+  color: #60483b;
+  font: italic 27px var(--site-font-heading);
+}
+
+.return-recipient-address {
+  position: absolute;
+  top: 57%;
+  width: 100%;
+  text-align: center;
+  color: #725b43;
+  font: 9px/1.5 Arial,sans-serif;
+  letter-spacing: .04em;
+}
+
+.return-envelope-bottom {
+  position: absolute;
+  bottom: 17px;
+  width: 100%;
+  text-align: center;
+  color: #927957;
+  font: 8px Arial,sans-serif;
+  letter-spacing: .17em;
+}
+
+.return-envelope.inserted .return-letter-slot { top: 15px; }
+
+.return-envelope.inserted .return-letter {
+  transform: rotate(0deg) scale(.96);
+  box-shadow: none;
+}
+
+.return-envelope.closed .return-flap { transform: rotateX(0deg); }
+
+.return-envelope.closed .return-seal {
+  opacity: 1;
+  left: auto;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%) scale(1);
+}
+
+.return-instruction {
+  color: #e9d8c2;
+  font: 14px/1.8 Georgia,serif;
+  margin: 12px auto 20px;
+  max-width: 360px;
+}
+
+.return-footnote {
+  color: #c5b49e;
+  font: 9px Arial,sans-serif;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  margin-top: 25px;
+}
+
+.return-scene .action { min-width: 190px; }
+
+@media(max-width:480px) {
+  .envelope-wrap { height: 275px; }
+
+  .front-address {
+    top: 22px;
+    left: 20px;
+    font-size: 10px;
+    line-height: 1.5;
+  }
+
+  .front-recipient { font-size: 25px; }
+  .front-recipient-address { top: 60%; font-size: 9px; }
+  .folded-letter-wrap { width: 84%; }
+  .scene { padding-top: 34px; }
+  .paper { padding: 30px 27px; }
+  .letter-choices { padding: 18px 12px; }
+  .letter-choices .action { min-width: 135px; }
+
+  .paper-hand {
+    width: 85px;
+    height: 135px;
+  }
+
+  .paper-hand .palm {
+    width: 62px;
+    height: 85px;
+  }
+
+  .paper-hand .finger {
+    width: 16px;
+    height: 70px;
+  }
+
+  .paper-hand .finger-one { left: 15px; }
+  .paper-hand .finger-two { left: 32px; }
+  .paper-hand .finger-three { left: 49px; }
+  .paper-hand .finger-four { left: 65px; }
+
+  .paper-hand .thumb {
+    width: 24px;
+    height: 55px;
+  }
+
+  .return-envelope-area { height: 270px; }
+  .return-envelope { height: 195px; }
+  .return-letter-slot {
+    height: 165px;
+    top: -90px;
+  }
+  .return-letter-name { font-size: 24px; }
+
+  .return-sender {
+    top: 17px;
+    left: 17px;
+    font-size: 9px;
+  }
+
+  .return-postmark {
+    width: 52px;
+    height: 52px;
+    right: 16px;
+    top: 15px;
+  }
+
+  .return-recipient { font-size: 24px; }
+  .return-recipient-address { font-size: 8px; }
+  .return-envelope-bottom { font-size: 7px; }
+}
+
+@media(prefers-reduced-motion:reduce) {
+  *,*:before,*:after {
+    animation-duration: .01ms !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+
+/* FINAL VISUAL POLISH — subtle details, keeping the original experience */
+.envelope-wrap {
+  filter: drop-shadow(0 28px 32px rgba(0,0,0,.32)) drop-shadow(0 2px 5px rgba(210,174,120,.08));
+}
+.envelope-front,
+.return-front-face {
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.42), inset 0 -14px 24px rgba(116,87,52,.08);
+}
+.envelope-front::after,
+.return-front-face::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: .2;
+  background: repeating-linear-gradient(115deg, transparent 0 5px, rgba(255,255,255,.13) 5.5px 6px, transparent 6.5px 12px);
+}
+.seal-button,
+.return-seal {
+  box-shadow: 0 5px 13px rgba(65,43,25,.28), inset 0 1px 2px rgba(255,248,220,.75), inset 0 -3px 5px rgba(73,48,23,.24);
+  text-shadow: 0 1px 2px rgba(73,48,23,.35);
+}
+.seal-button::before,
+.return-seal::before {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  border: 1px solid rgba(255,239,198,.35);
+  border-radius: 50%;
+  pointer-events: none;
+}
+.seal-button { overflow: hidden; }
+.seal-button::after {
+  content: '';
+  position: absolute;
+  width: 24px;
+  height: 70px;
+  top: -8px;
+  left: 8px;
+  transform: rotate(34deg);
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.18), transparent);
+  pointer-events: none;
+}
+.paper {
+  box-shadow: 0 28px 55px rgba(0,0,0,.34), inset 0 0 38px rgba(126,101,65,.11), inset 0 1px 0 rgba(255,255,255,.65);
+}
+.paper h2 {
+  letter-spacing: -.018em;
+  text-shadow: 0 .5px 0 rgba(255,255,255,.35);
+}
+.paper p {
+  max-width: 62ch;
+  color: #3d3a34;
+  text-wrap: pretty;
+}
+.letter-date {
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(157,128,87,.2);
+}
+.signature-name {
+  text-shadow: 0 .5px 0 rgba(255,255,255,.45);
+}
+.ps-area {
+  border-top-color: rgba(157,128,87,.48);
+}
+.ps-reveal {
+  letter-spacing: .015em;
+}
+.action,
+.turn-page-prompt,
+.ps-reveal,
+.sound-toggle {
+  -webkit-tap-highlight-color: transparent;
+}
+.action:focus-visible,
+.turn-page-prompt:focus-visible,
+.ps-reveal:focus-visible,
+.sound-toggle:focus-visible,
+.seal-button:focus-visible {
+  outline: 2px solid #d4aa70;
+  outline-offset: 4px;
+}
+
+@media (max-width: 480px) {
+  .topline { padding-top: 25px; font-size: 9px; letter-spacing: .25em; }
+  .scene { padding-left: 17px; padding-right: 17px; }
+  .paper { padding: 31px 25px; }
+  .paper h2 { font-size: 29px; line-height: 1.2; }
+  .paper p { font-size: 15.5px; line-height: 1.85; }
+  .letter-date { font-size: 13px; margin-bottom: 20px; }
+  .page-navigation { margin-top: 28px; }
+  .return-envelope { box-shadow: 0 22px 38px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.3); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .envelope-front { transition: filter .5s ease; }
+  .envelope-wrap:not(.opened):hover .envelope-front { filter: brightness(1.035); }
+  .return-envelope.closed { transition: transform .35s ease, box-shadow .35s ease; }
+  .return-envelope.closed:hover { box-shadow: 0 25px 42px rgba(0,0,0,.36), inset 0 1px 0 rgba(255,255,255,.3); }
+}
+
+</style>
+</head>
+
+<body>
+
+<main id="app">
+  <div class="ambient" aria-hidden="true"></div>
+
+  <button class="sound-toggle" id="soundToggle"
+    type="button" aria-label="Turn paper sounds off" title="Paper sounds on">
+    ♪
+  </button>
+
+  <div class="topline">A little note from Doha</div>
+
+  <!-- ENVELOPE EXPERIENCE -->
+
+  <section class="scene" id="intro">
+    <div class="eyebrow">Just something I wanted to share</div>
+
+    <h1>A letter for<br>Alona</h1>
+
+    <p class="subtitle">
+      A few words I wanted to send your way.<br>
+      Read them whenever you have a quiet moment.
+    </p>
+
+    <div class="envelope-stage" id="envelopeStage">
+      <div class="envelope-wrap" id="envelopeWrap">
+        <div class="envelope-3d">
+
+          <div class="envelope-face envelope-front">
+            <div class="front-address">
+              <span>Sent from</span>
+              Zone 16<br>
+              Doha, Qatar
+            </div>
+
+            <div class="postmark" aria-label="Doha Qatar postmark">
+              <strong>DOHA</strong>
+              <span>QATAR</span>
+              <small>09 NOV 2026</small>
+            </div>
+
+            <div class="front-recipient">Alona Tomy</div>
+
+            <div class="front-recipient-address">
+              Cheripurath (H)<br>
+              Kadaplamattom P.O.<br>
+              686571, Kerala, India
+            </div>
+
+            <div class="front-bottom">
+              A personal letter · From Doha with warmth
+            </div>
+          </div>
+
+          <div class="envelope-face envelope-back-face">
+            <div class="back-pocket"></div>
+            <div class="back-flap"></div>
+
+            <button class="seal-button" id="sealButton"
+              aria-label="Open the wax seal" title="Open the envelope">
+              A
+            </button>
+
+            <div class="back-caption">
+              A little note, sealed with care
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FOLDED LETTER -->
+
+      <div class="folded-letter-wrap" id="foldedLetterWrap">
+        <div class="folded-letter" id="foldedLetter" role="button"
+          tabindex="0" aria-label="Drag the folded letter out of the envelope">
+
+          <div class="fold-title">A personal letter</div>
+          <div class="fold-name">Dear Aloooo,</div>
+          <div class="fold-line"></div>
+          <div class="fold-hint">A few words, just for you</div>
+          <div class="fold-address">FROM DOHA · WITH Warmth</div>
+        </div>
+
+        <div class="extraction-hint" id="extractionHint">
+          Drag the letter out, then tap to unfold
+        </div>
+      </div>
+    </div>
+
+    <div class="instruction" id="instruction">
+      Turn the envelope over to discover what's inside.
+    </div>
+
+    <div class="stage-hint" id="stageHint">
+      Swipe or tap to rotate
+    </div>
+  </section>
+
+  <!-- READING EXPERIENCE -->
+
+  <section class="scene hidden" id="letterScene">
+    <div class="eyebrow">A few words for you</div>
+
+    <div class="paper-stage">
+
+      <!-- PAGE ONE -->
+
+      <article class="paper page-one page-turn-area" id="pageOne">
+        <div class="letter-date">Doha, 9 November 2026</div>
+        <div class="smallcap">A birthday letter from Doha</div>
+        <h2>Dear Aloooo,</h2>
+
+        <p>
+          I honestly don't know where to start. I've never really written a
+          letter like this before, so I hope you don't judge my writing too
+          much. 😅
+        </p>
+
+        <p>
+          Your birthday was coming up, and I kept thinking about what I could
+          do for you this time. I've been thinking about it for months,
+          actually. Sometimes I had an idea, then changed my mind, and then
+          came up with something else.
+        </p>
+
+        <p>
+          I still remember giving you chocolates last year. It was a small
+          thing, but I wanted to give you something you could actually hold
+          and enjoy. I wanted to do something like that again this year.
+        </p>
+
+        <p>
+          But well... I'm in Doha, and you're back in Kerala. I wish I could
+          have given you something in person, but that wasn't possible this
+          time.
+        </p>
+
+        <p>
+          I also thought about sending something by post, but it might take
+          too long or reach your home directly. I didn't want a birthday
+          surprise to create any unnecessary trouble for you.
+        </p>
+
+        <p>
+          So, after thinking about it for a while, I came up with this little
+          idea.
+        </p>
+
+        <!-- QATAR DESERT ILLUSTRATION -->
+
+        <svg class="sketch"
+          viewBox="0 0 520 220"
+          preserveAspectRatio="xMidYMid slice"
+          role="img"
+          aria-label="Qatar desert dunes, a camel and the Inland Sea">
+
+          <defs>
+            <linearGradient id="qatarDesertWash" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#c7a878" stop-opacity=".25"/>
+              <stop offset="1" stop-color="#c7a878" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+
+          <path d="M0 143 Q75 110 151 137 T300 130 Q395 101 520 137 L520 220 L0 220Z"
+            fill="url(#qatarDesertWash)"/>
+
+          <g fill="none" stroke="#77736b" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M0 145 Q70 113 145 139 T292 134 Q390 103 520 140" stroke-width="1.25"/>
+            <path d="M0 157 Q84 130 166 151 T326 148 Q419 124 520 153 M0 174 Q110 149 211 170 T405 164 Q466 154 520 165" stroke-width=".7" opacity=".7"/>
+            <path d="M0 104 Q48 89 94 100 Q137 109 172 91 Q211 72 255 89 L294 104" stroke-width="1.1"/>
+            <path d="M0 112 Q55 98 103 109 M181 98 Q226 82 278 101" stroke-width=".55"/>
+            <path d="M302 124 Q347 108 378 117 Q410 125 438 111 Q470 98 520 116 L520 147 Q444 132 390 145 Q339 151 302 137Z" stroke-width=".8" opacity=".8"/>
+            <path d="M308 135 Q365 126 417 137 T520 133 M327 143 Q380 137 438 145 T520 142" stroke-width=".6"/>
+            <path d="M84 157 Q95 151 106 155 L116 152 L125 157 L137 159 L145 165 L132 168 L119 166 L110 173 L105 165 L96 166 L91 173 L87 172 L90 162Z" stroke-width="1.05"/>
+            <path d="M104 155 L101 146 L106 139 L111 146 L111 155 M105 145 L98 141 M111 147 L117 143 M94 165 L92 179 M109 166 L111 179 M130 166 L134 177 M139 165 L143 174" stroke-width=".85"/>
+            <path d="M90 180 l-4 2 m24 -2 l-3 2 m29 -6 l-3 2" stroke-width=".55"/>
+            <path d="M18 189 Q110 178 205 190 T390 188 T520 184 M42 201 Q142 192 244 202 T440 198" stroke-width=".55" opacity=".65"/>
+            <path d="M355 84 q7 -5 14 0 m12 9 q6 -4 12 0 M420 76 q7 -5 13 0" stroke-width=".7"/>
+          </g>
+
+          <g fill="none" stroke="#9a886e" stroke-width=".45" opacity=".65">
+            <path d="M24 149 l32 -14 M36 156 l40 -17 M165 145 l31 -12 M191 154 l39 -13 M450 155 l32 -8 M394 172 l47 -9 M154 188 l32 -5 M280 194 l44 -4"/>
+            <path d="M67 117 l17 -5 M216 87 l18 -6 M340 120 l20 -4 M465 121 l25 4"/>
+          </g>
+        </svg>
+
+        <div class="sketch-caption">
+          The quiet beauty of Qatar · Golden dunes meeting the Inland Sea
+        </div>
+
+        <div class="page-navigation">
+          <div class="page-count">1 of 2</div>
+          <button class="turn-page-prompt" id="nextPageBtn" type="button">
+            Turn the page <span class="arrow">↓</span>
+          </button>
+        </div>
+      </article>
+
+      <!-- PAGE TWO -->
+
+      <article class="paper page-two page-turn-area" id="pageTwo">
+
+        <!-- QATAR COAST ILLUSTRATION -->
+
+        <svg class="sketch"
+          viewBox="0 0 520 220"
+          preserveAspectRatio="xMidYMid slice"
+          role="img"
+          aria-label="Qatar coast with a traditional dhow and Doha skyline">
+
+          <defs>
+            <linearGradient id="qatarCoastWash" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#b9aa91" stop-opacity=".2"/>
+              <stop offset="1" stop-color="#b9aa91" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+
+          <path d="M0 142 Q110 135 220 142 T520 139 L520 220 L0 220Z"
+            fill="url(#qatarCoastWash)"/>
+
+          <g fill="none" stroke="#77736b" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="423" cy="54" r="23" stroke-width=".65" opacity=".55"/>
+            <path d="M390 54 Q423 49 456 54 M396 62 Q423 57 450 62" stroke-width=".45" opacity=".45"/>
+            <path d="M0 128 Q48 119 91 126 Q132 136 174 123 Q217 110 255 125 M0 139 Q55 130 111 140" stroke-width="1.1"/>
+            <path d="M0 146 Q88 139 177 147 T350 145 T520 144 M0 158 Q90 151 180 159 T360 157 T520 156" stroke-width=".75" opacity=".8"/>
+            <path d="M17 126 L17 97 L29 97 L29 126 M21 97 L24 90 L27 97 M38 126 L38 107 L51 107 L51 126 M68 126 L68 86 L82 86 L82 126 M72 86 L75 78 L79 86" stroke-width=".75" opacity=".65"/>
+            <path d="M105 127 L105 96 L119 96 L119 127 M110 96 L114 87 L117 96 M128 127 L128 109 L140 109 L140 127" stroke-width=".75" opacity=".65"/>
+            <path d="M306 135 Q342 127 372 136 Q405 143 439 132 Q476 122 520 132" stroke-width="1.05"/>
+            <path d="M321 142 Q370 137 417 145 T520 141 M354 151 Q404 147 455 153 T520 150" stroke-width=".55"/>
+            <path d="M175 151 Q244 140 322 151 Q300 176 248 178 Q200 175 175 151Z" stroke-width="1.35"/>
+            <path d="M247 149 L247 63 M247 68 Q219 91 213 151 M251 78 Q278 100 287 151 M247 63 L247 52" stroke-width="1.05"/>
+            <path d="M247 65 Q225 76 218 103 Q238 91 247 65 M251 75 Q271 85 281 112 Q260 99 251 75" stroke-width=".75"/>
+            <path d="M215 151 Q247 160 286 151 M228 155 L222 165 M266 155 L273 165 M245 157 L245 170" stroke-width=".65"/>
+            <path d="M192 161 Q247 170 307 160 M208 169 Q250 176 293 168 M226 180 Q250 184 278 179" stroke-width=".55" opacity=".7"/>
+            <path d="M25 181 Q92 176 159 182 M340 179 Q404 172 470 179 M367 190 Q426 185 493 190 M43 197 Q104 192 166 198" stroke-width=".55" opacity=".7"/>
+            <path d="M331 83 q7 -5 14 0 m9 9 q7 -4 14 0 M83 61 q6 -4 12 0 M108 72 q6 -4 12 0" stroke-width=".65" opacity=".65"/>
+          </g>
+
+          <g fill="none" stroke="#9a886e" stroke-width=".45" opacity=".65">
+            <path d="M188 151 l-18 -4 m148 1 l22 -5 M211 164 l-26 7 m105 -7 l28 7 M362 161 l33 -4 M403 168 l36 -3 M18 151 l25 -3 M70 166 l38 -2"/>
+            <path d="M233 92 l8 -8 m-4 18 l8 -8 M260 96 l8 7 M235 129 l-7 9 M262 132 l8 8"/>
+          </g>
+        </svg>
+
+        <div class="sketch-caption">
+          Qatar's coast · A traditional dhow on the Arabian Gulf
+        </div>
+
+        <div class="thankyou">
+          <div class="smallcap">A little something from here</div>
+          <h2>And one more thing...</h2>
+
+          <p>
+            I thought this would be a nice way to send you a little something
+            from Doha.
+          </p>
+
+          <p>
+            I don't know how you'll react when you read all this. Maybe you'll
+            smile, maybe you'll laugh at how much effort went into a letter.
+            😂 But anyway, I wanted to do something a little different this
+            year.
+          </p>
+
+          <p>
+            And of course, I hope you get to enjoy all your favourites too
+            — some yummy momos, a good plate of pasta, and a lovely cold coffee. 
+            I hope you get to treat yourself to all the things that make you happy 😄❤️.
+             It's your birthday, after all! ❤️
+          </p>
+
+          <p>
+            I hope this coming year brings you lots of happiness, good health,
+            new experiences, and opportunities to do all the things you've
+            been hoping for.
+          </p>
+
+          <p>
+            And whatever this year has planned for you, I hope there are plenty
+            of good days waiting ahead.
+          </p>
+
+          <h2>Happy Birthday, Aloooo! ❤️</h2>
+
+          <p>Take care of yourself, okay?</p>
+
+          <div class="signature" id="signature">
+            with lots of love and good wishes,<br>
+            <span class="signature-name">Dito ❤️</span>
+          </div>
+
+          <!-- HIDDEN P.S. -->
+
+          <div class="ps-area">
+            <button class="ps-reveal" id="psRevealBtn" type="button"
+              aria-expanded="false">
+              One tiny P.S. · Open if you like
+            </button>
+
+            <div class="ps-note" id="psNote">
+              <p>
+                P.S. I hope today gives you at least one little reason
+                to smile. That's all. 😊
+              </p>
+            </div>
+          </div>
+
+          <div class="closing">From Doha · With good wishes</div>
+        </div>
+
+        <div class="page-navigation">
+          <div class="page-count">2 of 2</div>
+          <div class="page-end-note">The end of this little letter</div>
+        </div>
+      </article>
+
+      <!-- ANIMATED HANDS -->
+
+      <div class="paper-hand left-hand" aria-hidden="true">
+        <span class="palm"></span>
+        <span class="finger finger-one"></span>
+        <span class="finger finger-two"></span>
+        <span class="finger finger-three"></span>
+        <span class="finger finger-four"></span>
+        <span class="thumb"></span>
+      </div>
+
+      <div class="paper-hand right-hand" aria-hidden="true">
+        <span class="palm"></span>
+        <span class="finger finger-one"></span>
+        <span class="finger finger-two"></span>
+        <span class="finger finger-three"></span>
+        <span class="finger finger-four"></span>
+        <span class="thumb"></span>
+      </div>
+
+    </div>
+
+    <!-- FINAL CHOICES -->
+
+    <div class="letter-choices hidden" id="letterChoices"
+      aria-label="Choose what to do with the letter">
+
+      <p class="choice-caption">
+        What would you like to do with this letter?
+      </p>
+
+      <div class="controls">
+        <button class="action" id="keepLetterBtn" type="button">
+          Keep it
+        </button>
+
+        <button class="action throw-away" id="throwLetterBtn" type="button">
+          Throw it away
+        </button>
+      </div>
+    </div>
+
+    <div class="page-hint" id="pageHint">
+      Turn the page to continue
+    </div>
+
+    <div class="controls page-controls">
+      <button class="action page-back" id="backBtn" type="button">
+        ← Back
+      </button>
+    </div>
+
+    <div class="footer">
+      A little note · A lot of good wishes
+    </div>
+  </section>
+
+  <!-- RETURN SCENE -->
+
+  <section class="return-scene hidden" id="returnScene">
+
+    <div class="return-caption" id="returnCaption">
+      A letter, back where it belongs
+    </div>
+
+    <div class="return-envelope-area">
+      <div class="return-envelope" id="returnEnvelope">
+
+        <div class="return-pocket"></div>
+
+        <div class="return-letter-slot" id="returnLetterSlot">
+          <div class="return-letter" id="returnLetter">
+            <span class="return-letter-top">A PERSONAL LETTER</span>
+            <span class="return-letter-name">Dear Aloooo,</span>
+            <span class="return-letter-line"></span>
+            <span class="return-letter-bottom">FROM DOHA · WITH WARMTH</span>
+          </div>
+        </div>
+
+        <!-- ADDRESSED FRONT OF THE ORIGINAL ENVELOPE -->
+
+        <div class="return-front-face">
+          <div class="return-sender">
+            <span>SENT FROM</span>
+            Zone 16<br>
+            Doha, Qatar
+          </div>
+
+          <div class="return-postmark">
+            <strong>DOHA</strong>
+            <span>QATAR</span>
+            <small>09 NOV 2026</small>
+          </div>
+
+          <div class="return-recipient">
+            Alona Tomy
+          </div>
+
+          <div class="return-recipient-address">
+            Cheripurath (H)<br>
+            Kadaplamattom P.O.<br>
+            686571, Kerala, India
+          </div>
+
+          <div class="return-envelope-bottom">
+            A PERSONAL LETTER · FROM DOHA
+          </div>
+        </div>
+
+        <div class="return-flap"></div>
+        <div class="return-seal">A</div>
+
+      </div>
+    </div>
+
+    <p class="return-instruction" id="returnInstruction">
+      Your letter is ready to go back inside.
+    </p>
+
+    <button class="action" id="insertLetterBtn" type="button">
+      Put the letter inside
+    </button>
+
+    <button class="action hidden" id="openEnvelopeBtn" type="button">
+      Open the envelope
+    </button>
+
+    <button class="action hidden" id="takeLetterBtn" type="button">
+      Take the letter out
+    </button>
+
+    <p class="return-footnote" id="returnFootnote">
+      A little something, kept safe.
+    </p>
+
+  </section>
+</main>
+
+<!-- EMAILJS LIBRARY -->
+
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+<script>
+const intro = document.getElementById('intro');
+const letterScene = document.getElementById('letterScene');
+
+const envelopeStage = document.getElementById('envelopeStage');
+const envelopeWrap = document.getElementById('envelopeWrap');
+const sealButton = document.getElementById('sealButton');
+
+const instruction = document.getElementById('instruction');
+const stageHint = document.getElementById('stageHint');
+
+const foldedLetterWrap = document.getElementById('foldedLetterWrap');
+const foldedLetter = document.getElementById('foldedLetter');
+const extractionHint = document.getElementById('extractionHint');
+
+const pageOne = document.getElementById('pageOne');
+const pageTwo = document.getElementById('pageTwo');
+const pageHint = document.getElementById('pageHint');
+const backBtn = document.getElementById('backBtn');
+const nextPageBtn = document.getElementById('nextPageBtn');
+
+const letterChoices = document.getElementById('letterChoices');
+const paperStage = document.querySelector('.paper-stage');
+const keepLetterBtn = document.getElementById('keepLetterBtn');
+const throwLetterBtn = document.getElementById('throwLetterBtn');
+
+const returnScene = document.getElementById('returnScene');
+const returnEnvelope = document.getElementById('returnEnvelope');
+const returnInstruction = document.getElementById('returnInstruction');
+const returnFootnote = document.getElementById('returnFootnote');
+const returnCaption = document.getElementById('returnCaption');
+const insertLetterBtn = document.getElementById('insertLetterBtn');
+const openEnvelopeBtn = document.getElementById('openEnvelopeBtn');
+const takeLetterBtn = document.getElementById('takeLetterBtn');
+const returnLetterSlot = document.getElementById('returnLetterSlot');
+
+const signature = document.getElementById('signature');
+const psRevealBtn = document.getElementById('psRevealBtn');
+const psNote = document.getElementById('psNote');
+const soundToggle = document.getElementById('soundToggle');
+
+/* EMAILJS CONFIGURATION */
+
+const EMAILJS_PUBLIC_KEY = 'G_70Qsr6WcTLQvbP1';
+const EMAILJS_SERVICE_ID = 'service_ftxv3va';
+const EMAILJS_TEMPLATE_ID = 'template_wc76nkp';
+
+let choiceSubmitted = false;
+let readOnlyMode = false;
+
+/* OPTIONAL PAPER SOUND EFFECTS */
+
+let soundEnabled = true;
+let audioContext = null;
+
+function getAudioContext() {
+  if (!audioContext) {
+    const AudioContextClass =
+      window.AudioContext || window.webkitAudioContext;
+
+    if (!AudioContextClass) return null;
+
+    audioContext = new AudioContextClass();
+  }
+
+  if (audioContext.state === 'suspended') {
+    audioContext.resume().catch(() => {});
+  }
+
+  return audioContext;
+}
+
+function paperSound(type = 'rustle') {
+  if (!soundEnabled) return;
+
+  const ctx = getAudioContext();
+  if (!ctx) return;
+
+  const now = ctx.currentTime;
+
+  const duration = type === 'seal' ? 0.32 : 0.22;
+  const bufferSize = Math.floor(ctx.sampleRate * duration);
+  const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+  const data = buffer.getChannelData(0);
+
+  for (let i = 0; i < bufferSize; i++) {
+    data[i] = (Math.random() * 2 - 1) *
+      (1 - i / bufferSize);
+  }
+
+  const source = ctx.createBufferSource();
+  source.buffer = buffer;
+
+  const filter = ctx.createBiquadFilter();
+  filter.type = 'lowpass';
+  filter.frequency.value = type === 'seal' ? 650 : 1100;
+
+  const gain = ctx.createGain();
+  gain.gain.setValueAtTime(0.0001, now);
+  gain.gain.exponentialRampToValueAtTime(
+    type === 'seal' ? 0.045 : 0.025,
+    now + 0.035
+  );
+  gain.gain.exponentialRampToValueAtTime(
+    0.0001,
+    now + duration
+  );
+
+  source.connect(filter);
+  filter.connect(gain);
+  gain.connect(ctx.destination);
+
+  source.start(now);
+  source.stop(now + duration);
+}
+
+soundToggle.addEventListener('click', () => {
+  soundEnabled = !soundEnabled;
+
+  soundToggle.textContent = soundEnabled ? '♪' : '×';
+  soundToggle.title = soundEnabled
+    ? 'Paper sounds on'
+    : 'Paper sounds off';
+
+  soundToggle.setAttribute(
+    'aria-label',
+    soundEnabled ? 'Turn paper sounds off' : 'Turn paper sounds on'
+  );
+
+  if (soundEnabled) paperSound('rustle');
+});
+
+/* SEND PRIVATE EMAIL NOTIFICATION */
+
+function sendChoiceNotification(choice) {
+  if (choiceSubmitted) return;
+
+  choiceSubmitted = true;
+
+  const labels = {
+    keep: 'Alona chose to KEEP the letter.',
+    throw: 'Alona chose to THROW AWAY the letter.'
+  };
+
+  const now = new Date();
+
+  const templateParams = {
+    choice: labels[choice],
+    date: now.toLocaleDateString(),
+    time: now.toLocaleTimeString(),
+    website: 'A Letter from Doha'
+  };
+
+  if (!window.emailjs) {
+    console.error('EmailJS could not be loaded.');
+    return;
+  }
+
+  emailjs.send(
+    EMAILJS_SERVICE_ID,
+    EMAILJS_TEMPLATE_ID,
+    templateParams,
+    { publicKey: EMAILJS_PUBLIC_KEY }
+  ).then(response => {
+    console.log('Private notification email sent successfully:', response.status);
+  }).catch(error => {
+    console.error('Notification email could not be sent:', error);
+  });
+}
+
+let stage = 0;
+// 0 front, 1 back, 2 opened, 3 extracted, 4 reading
+
+let pointerStartX = 0;
+let pointerStartY = 0;
+let pointerActive = false;
+let dragHandled = false;
+let letterDragging = false;
+let letterStartY = 0;
+let letterCurrentY = 0;
+let currentPage = 1;
+let pageStartX = 0;
+let pagePointerActive = false;
+let returnStage = 0;
+
+/* ENVELOPE ROTATION */
+
+function rotateEnvelope() {
+  if (stage === 0) {
+    envelopeWrap.classList.add('turned');
+    stage = 1;
+    paperSound('rustle');
+
+    instruction.textContent =
+      'There it is. Tap the golden seal to open your letter.';
+
+    stageHint.textContent = 'Tap the wax seal';
+
+  } else if (stage === 1) {
+    envelopeWrap.classList.remove('turned');
+    stage = 0;
+    paperSound('rustle');
+
+    instruction.textContent =
+      "Turn the envelope over to discover what's inside.";
+
+    stageHint.textContent = 'Swipe or tap to rotate';
+  }
+}
+
+envelopeStage.addEventListener('pointerdown', event => {
+  if (stage > 1 || event.target.closest('.seal-button')) return;
+
+  pointerStartX = event.clientX;
+  pointerStartY = event.clientY;
+  pointerActive = true;
+  dragHandled = false;
+});
+
+envelopeStage.addEventListener('pointerup', event => {
+  if (!pointerActive || stage > 1) return;
+
+  pointerActive = false;
+
+  const dx = event.clientX - pointerStartX;
+  const dy = event.clientY - pointerStartY;
+
+  if (Math.abs(dx) > 35 && Math.abs(dx) > Math.abs(dy)) {
+    dragHandled = true;
+
+    if ((dx < 0 && stage === 0) || (dx > 0 && stage === 1)) {
+      rotateEnvelope();
+    }
+  }
+});
+
+envelopeStage.addEventListener('pointercancel', () => {
+  pointerActive = false;
+});
+
+envelopeStage.addEventListener('click', event => {
+  if (dragHandled) {
+    dragHandled = false;
+    return;
+  }
+
+  if (stage > 1 || event.target.closest('.seal-button')) return;
+  rotateEnvelope();
+});
+
+/* OPEN THE ORIGINAL SEAL */
+
+sealButton.addEventListener('click', event => {
+  event.stopPropagation();
+
+  if (stage !== 1) return;
+
+  paperSound('seal');
+
+  envelopeWrap.classList.add('opened');
+  stage = 2;
+
+  instruction.textContent =
+    'The seal is open. Gently pull the letter out of its envelope.';
+
+  stageHint.textContent = 'Pull the letter out';
+
+  setTimeout(() => {
+    foldedLetterWrap.classList.add('visible');
+  }, 700);
+});
+
+/* MANUAL LETTER EXTRACTION */
+
+foldedLetter.addEventListener('pointerdown', event => {
+  if (stage !== 2) return;
+
+  letterDragging = true;
+  letterStartY = event.clientY;
+  letterCurrentY = 0;
+
+  foldedLetter.setPointerCapture(event.pointerId);
+});
+
+foldedLetter.addEventListener('pointermove', event => {
+  if (!letterDragging || stage !== 2) return;
+
+  const dy = Math.min(190, Math.max(0, letterStartY - event.clientY));
+  letterCurrentY = dy;
+
+  foldedLetter.style.transform =
+    `translateY(${-dy}px) rotateX(${Math.min(12,dy/12)}deg)`;
+});
+
+function finishExtraction() {
+  if (!letterDragging || stage !== 2) return;
+
+  letterDragging = false;
+
+  if (letterCurrentY > 65) {
+    stage = 3;
+    paperSound('rustle');
+
+    envelopeWrap.classList.add('extracted');
+
+    foldedLetter.style.transform =
+      'translateY(-120px) scale(1.04) rotateX(0deg)';
+
+    foldedLetter.style.boxShadow = '0 25px 50px #0007';
+
+    instruction.textContent =
+      'You have your letter. Take a moment before opening it.';
+
+    stageHint.textContent = 'Your letter is out';
+
+    extractionHint.textContent = 'Tap the folded letter to unfold it';
+    foldedLetter.style.cursor = 'pointer';
+
+    foldedLetter.setAttribute('aria-label','Tap to unfold the letter');
+
+  } else {
+    foldedLetter.style.transform = '';
+  }
+
+  letterCurrentY = 0;
+}
+
+foldedLetter.addEventListener('pointerup', finishExtraction);
+
+foldedLetter.addEventListener('pointercancel', () => {
+  letterDragging = false;
+  foldedLetter.style.transform = '';
+});
+
+/* MANUAL UNFOLDING */
+
+function unfoldLetter() {
+  if (stage !== 3) return;
+
+  stage = 4;
+  paperSound('rustle');
+
+  foldedLetter.style.transition =
+    'transform .65s ease, opacity .65s ease';
+
+  foldedLetter.style.transform =
+    'perspective(1000px) rotateX(90deg) scale(.7)';
+
+  foldedLetter.style.opacity = '0';
+
+  instruction.textContent = 'Opening your letter...';
+
+  setTimeout(() => {
+    intro.classList.add('hidden');
+    letterScene.classList.remove('hidden');
+
+    readOnlyMode = false;
+    showPage(1);
+
+    window.scrollTo({top:0,behavior:'smooth'});
+  }, 650);
+}
+
+foldedLetter.addEventListener('click', unfoldLetter);
+
+foldedLetter.addEventListener('keydown', event => {
+  if (stage === 3 && (event.key === 'Enter' || event.key === ' ')) {
+    event.preventDefault();
+    unfoldLetter();
+  }
+});
+
+/* PAGE NAVIGATION */
+
+function showPage(page) {
+  currentPage = page;
+
+  if (page === 1) {
+    pageOne.classList.remove('hidden');
+    pageTwo.classList.remove('active');
+    letterChoices.classList.add('hidden');
+
+    pageHint.textContent = readOnlyMode
+      ? 'You can turn the page to read the rest'
+      : 'Turn the page to continue';
+
+  } else {
+    pageOne.classList.add('hidden');
+    pageTwo.classList.add('active');
+
+    if (readOnlyMode) {
+      letterChoices.classList.add('hidden');
+      pageHint.textContent = 'You have reached the end of the letter';
+    } else {
+      letterChoices.classList.remove('hidden');
+      pageHint.textContent = 'You have reached the end of the letter';
+
+      signature.classList.remove('signed');
+      requestAnimationFrame(() => {
+        setTimeout(() => signature.classList.add('signed'), 450);
+      });
+    }
+  }
+
+  backBtn.textContent = readOnlyMode
+    ? '← Back to envelope'
+    : '← Back';
+
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function turnPage(direction) {
+  if (direction === 'next' && currentPage === 1) {
+    paperSound('rustle');
+    turnPageToTwo();
+  } else if (direction === 'back' && currentPage === 2) {
+    paperSound('rustle');
+    showPage(1);
+  }
+}
+
+function turnPageToTwo() {
+  showPage(2);
+}
+
+nextPageBtn.addEventListener('click', () => {
+  turnPage('next');
+});
+
+letterScene.addEventListener('pointerdown', event => {
+  if (!event.target.closest('.paper')) return;
+
+  pagePointerActive = true;
+  pageStartX = event.clientX;
+});
+
+letterScene.addEventListener('pointerup', event => {
+  if (!pagePointerActive) return;
+
+  pagePointerActive = false;
+
+  const dx = event.clientX - pageStartX;
+
+  if (Math.abs(dx) > 65) {
+    if (dx < 0 && currentPage === 1) {
+      turnPage('next');
+    } else if (dx > 0 && currentPage === 2) {
+      turnPage('back');
+    }
+  }
+});
+
+letterScene.addEventListener('pointercancel', () => {
+  pagePointerActive = false;
+});
+
+/* HIDDEN P.S. NOTE */
+
+psRevealBtn.addEventListener('click', () => {
+  const isOpen = psNote.classList.toggle('visible');
+
+  psRevealBtn.setAttribute('aria-expanded', String(isOpen));
+  psRevealBtn.textContent = isOpen
+    ? 'Close the little P.S.'
+    : 'One tiny P.S. · Open if you like';
+
+  if (isOpen) paperSound('rustle');
+});
+
+/* KEEP IT: FOLD THE LETTER AND SHOW THE ENVELOPE */
+
+keepLetterBtn.addEventListener('click', () => {
+  if (choiceSubmitted) return;
+
+  sendChoiceNotification('keep');
+  paperSound('rustle');
+
+  keepLetterBtn.disabled = true;
+  throwLetterBtn.disabled = true;
+
+  paperStage.classList.add('keep-folding');
+
+  setTimeout(() => {
+    letterScene.classList.add('hidden');
+    returnScene.classList.remove('hidden');
+
+    returnEnvelope.classList.remove('inserted','closed');
+
+    // Reset the letter position for a fresh insertion.
+    returnLetterSlot.style.top = '';
+
+    returnCaption.textContent = 'A letter, back where it belongs';
+
+    returnInstruction.textContent =
+      'Your letter is folded and ready to go back inside.';
+
+    returnFootnote.textContent =
+      'A little something, kept safe.';
+
+    insertLetterBtn.classList.remove('hidden');
+    insertLetterBtn.disabled = false;
+
+    openEnvelopeBtn.classList.add('hidden');
+    takeLetterBtn.classList.add('hidden');
+
+    returnStage = 1;
+
+    window.scrollTo({top:0,behavior:'smooth'});
+  }, 1900);
+});
+
+/* PUT THE FOLDED LETTER INTO THE ENVELOPE */
+
+insertLetterBtn.addEventListener('click', () => {
+  if (returnStage !== 1) return;
+
+  returnStage = 2;
+  insertLetterBtn.disabled = true;
+  paperSound('rustle');
+
+  returnInstruction.textContent =
+    'Gently putting your letter back inside...';
+
+  returnEnvelope.classList.add('inserted');
+
+  setTimeout(() => {
+    returnEnvelope.classList.add('closed');
+    paperSound('seal');
+
+    returnCaption.textContent = 'A little letter from Doha';
+
+    returnInstruction.textContent =
+      'Safely tucked away.';
+
+    returnFootnote.textContent =
+      'A little letter from Doha, kept safe.';
+
+    insertLetterBtn.classList.add('hidden');
+    openEnvelopeBtn.classList.remove('hidden');
+
+    returnStage = 3;
+  }, 1150);
+});
+
+/* REOPEN THE SEALED ENVELOPE */
+
+function reopenEnvelope() {
+  if (returnStage !== 3) return;
+
+  returnStage = 4;
+  paperSound('seal');
+
+  openEnvelopeBtn.classList.add('hidden');
+
+  returnInstruction.textContent =
+    'The seal is broken. Your letter is inside.';
+
+  returnFootnote.textContent =
+    'Tap the letter when you are ready to take it out.';
+
+  returnEnvelope.classList.remove('closed','inserted');
+
+  setTimeout(() => {
+    takeLetterBtn.classList.remove('hidden');
+    returnStage = 5;
+  }, 1050);
+}
+
+openEnvelopeBtn.addEventListener('click', reopenEnvelope);
+
+/* TAKE THE LETTER OUT AGAIN */
+
+function takeLetterOutAgain() {
+  if (returnStage !== 5) return;
+
+  returnStage = 6;
+  takeLetterBtn.disabled = true;
+  paperSound('rustle');
+
+  returnInstruction.textContent =
+    'Taking your letter out...';
+
+  returnLetterSlot.style.top = '-105px';
+
+  setTimeout(() => {
+    returnScene.classList.add('hidden');
+    letterScene.classList.remove('hidden');
+
+    paperStage.classList.remove('keep-folding','throwing');
+
+    readOnlyMode = true;
+    showPage(1);
+
+    takeLetterBtn.classList.add('hidden');
+    takeLetterBtn.disabled = false;
+
+    // Clear the inline position so the next opening works correctly.
+    returnLetterSlot.style.top = '';
+
+    window.scrollTo({top:0,behavior:'smooth'});
+
+    returnStage = 7;
+  }, 1200);
+}
+
+takeLetterBtn.addEventListener('click', takeLetterOutAgain);
+
+/* BACK TO THE SEALED ENVELOPE AFTER REREADING */
+
+function returnToSealedEnvelope() {
+  letterScene.classList.add('hidden');
+  returnScene.classList.remove('hidden');
+
+  returnEnvelope.classList.add('inserted','closed');
+  returnLetterSlot.style.top = '';
+
+  returnCaption.textContent = 'A little letter from Doha';
+
+  returnInstruction.textContent =
+    'Your letter is safely tucked away.';
+
+  returnFootnote.textContent =
+    'Whenever you want to read it again, just open the envelope.';
+
+  insertLetterBtn.classList.add('hidden');
+  takeLetterBtn.classList.add('hidden');
+  openEnvelopeBtn.classList.remove('hidden');
+
+  returnStage = 3;
+
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* THROW IT AWAY */
+
+throwLetterBtn.addEventListener('click', () => {
+  if (choiceSubmitted) return;
+
+  sendChoiceNotification('throw');
+  paperSound('rustle');
+
+  keepLetterBtn.disabled = true;
+  throwLetterBtn.disabled = true;
+
+  paperStage.classList.add('throwing');
+
+  setTimeout(() => {
+    paperStage.classList.remove('throwing','keep-folding');
+
+    letterChoices.classList.add('hidden');
+    letterScene.classList.add('hidden');
+    intro.classList.remove('hidden');
+
+    // Leave the envelope open and empty.
+
+    envelopeWrap.classList.remove('extracted');
+    envelopeWrap.classList.add('turned','opened');
+
+    foldedLetterWrap.classList.remove('visible');
+    foldedLetter.style.opacity = '0';
+
+    stage = 2;
+
+    instruction.textContent = '';
+    stageHint.textContent = '';
+
+    choiceSubmitted = false;
+    readOnlyMode = false;
+
+    keepLetterBtn.disabled = false;
+    throwLetterBtn.disabled = false;
+
+    window.scrollTo({top:0,behavior:'smooth'});
+
+  }, 1850);
+});
+
+/* BACK BUTTON */
+
+backBtn.addEventListener('click', () => {
+  if (currentPage === 2) {
+    turnPage('back');
+    return;
+  }
+
+  if (readOnlyMode) {
+    returnToSealedEnvelope();
+    return;
+  }
+
+  letterChoices.classList.add('hidden');
+  letterScene.classList.add('hidden');
+  intro.classList.remove('hidden');
+
+  stage = 3;
+
+  foldedLetterWrap.classList.add('visible');
+  foldedLetter.style.opacity = '1';
+
+  foldedLetter.style.transform =
+    'translate(-50%,-48%) scale(1)';
+
+  foldedLetter.style.transition =
+    'transform .6s ease, opacity .6s ease';
+
+  instruction.textContent =
+    'Your letter is here whenever you want to open it again.';
+
+  stageHint.textContent = 'Your letter';
+
+  extractionHint.textContent =
+    'Tap the folded letter to unfold it';
+
+  window.scrollTo({top:0,behavior:'smooth'});
+});
+
+</script>
+
+</body>
+</html>
